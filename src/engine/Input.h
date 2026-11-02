@@ -1,6 +1,8 @@
-
 // Input.h
 
 #pragma once
 
-void user_specific_key_input();
+#include <SDL3/SDL.h>
+
+void users_ui_input(const SDL_Event& event);
+void users_utility_input(const SDL_Event& event);

@@ -1,24 +1,26 @@
-
 // Game.h
 
 #pragma once
 
+#include "../entities/Character.h"
+
 #include <SDL3/SDL.h>
+#include <vector>
 
 #define WINDOW_TITLE "My Roguelike"
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
 #define TILE_SIZE 100
+#define SPRITE_FRAME_SIZE 100
 
-struct Character {
-    float x = 0;
-    float y = 0;
 
-    float offset_x = 0;
-    float offset_y = 0;
+enum class GameState {
+    MainMenu,
+    Playing,
+    Paused,
+    Quit
+};
 
-    int sprite_column = 0;
-    int sprite_row = 0;
+struct Menu {
+    int selected = 0;
 };
 
 struct Inventory {
@@ -35,14 +37,21 @@ struct Camera {
 struct Game {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
-    SDL_Texture* character_texture = nullptr;
 
     Character player;
+    Character orc;
+    std::vector<Character> enemies;
+
     Camera camera;
     Inventory inventory;
 
+    GameState state = GameState::MainMenu;
+    Menu menu;
+
     SDL_Event event;
-    bool running = true;
+
+    int screen_width = 0;
+    int screen_height = 0;
 };
 
 // Declaration: the actual game object is defined in Game.cpp.
@@ -51,5 +60,3 @@ extern Game game;
 bool initialize_game();
 void game_loop();
 void shutdown_game();
-
-void user_specific_key_input();

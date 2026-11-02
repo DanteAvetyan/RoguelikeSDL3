@@ -1,26 +1,29 @@
-
 // Input.cpp
 
 #include <SDL3/SDL.h>
+#include "Input.h"
 #include "Game.h"
 
-void user_specific_key_input() {
-    while (SDL_PollEvent(&game.event)) {
+void users_ui_input(const SDL_Event& event) {
 
-        if (game.event.type == SDL_EVENT_QUIT) {
-            game.running = false;
-        }
+    if (event.type != SDL_EVENT_KEY_DOWN) return;
 
-        if (game.event.type == SDL_EVENT_KEY_DOWN &&
-            game.event.key.key == SDLK_Q) {
+    switch (event.key.key) {
+        case SDLK_Q:
+            game.state = GameState::Quit;
+            break;
 
-            game.running = false;
-
-            }
-        else if (game.event.type == SDL_EVENT_KEY_DOWN &&
-                 game.event.key.key == SDLK_I) {
-
-            game.inventory.torch = !game.inventory.torch;
-                 }
+        case SDLK_M:
+            game.state = GameState::MainMenu;
+            break;
     }
+}
+
+void users_utility_input(const SDL_Event& event) {
+
+    if (event.type == SDL_EVENT_KEY_DOWN &&
+        event.key.key == SDLK_I) {
+
+        game.inventory.torch = !game.inventory.torch;
+        }
 }

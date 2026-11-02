@@ -22,6 +22,14 @@ add_executable(RoguelikeSDL3
         src/engine/Game.h
         src/engine/Input.h
         src/main.h
+        src/engine/Menu.h
+        src/engine/Menu.cpp
+        src/entities/Player.h
+        src/entities/Player.cpp
+        src/entities/Character.h
+        src/entities/Character.cpp
+        src/entities/Enemies.h
+        src/entities/Enemies.cpp
 )
 
 # Link SDL3 to our game.
