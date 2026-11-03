@@ -3,9 +3,12 @@
 #pragma once
 
 #include "../entities/Character.h"
+#include "Camera.h"
 
 #include <SDL3/SDL.h>
 #include <vector>
+
+#include "SDL3_ttf/SDL_ttf.h"
 
 #define WINDOW_TITLE "My Roguelike"
 #define TILE_SIZE 100
@@ -48,6 +51,8 @@ struct Game {
     GameState state = GameState::MainMenu;
     Menu menu;
 
+    TTF_Font* font = nullptr;
+
     SDL_Event event;
 
     int screen_width = 0;
@@ -57,6 +62,7 @@ struct Game {
 // Declaration: the actual game object is defined in Game.cpp.
 extern Game game;
 
+void load_assets();
 bool initialize_game();
 void game_loop();
 void shutdown_game();

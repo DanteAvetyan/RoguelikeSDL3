@@ -26,13 +26,34 @@ void menu_input(const SDL_Event& event) {
 
 void menu_render() {
 
+    if (!game.font) return;
+
     for (int i = 0; i < MENU_COUNT; i++) {
+        SDL_Color color;
         if ( i == game.menu.selected ) {
-            SDL_SetRenderDrawColor(game.renderer, 255, 220, 0, 255);
+            color = {255, 220, 0, 255};
         }
         else
-            SDL_SetRenderDrawColor(game.renderer, 200, 200, 200, 255);
+            color = {200, 200, 200, 255};
 
-        SDL_RenderDebugText(game.renderer, game.screen_width/2, game.screen_height/2 + i * 20.0f, MENU_ITEMS[i]);
+        SDL_Surface* surface = TTF_RenderText_Solid(game.font, MENU_ITEMS[i], 0, color);
+        if (!surface) continue;
+
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(game.renderer, surface);
+        if (!texture) continue;
+
+        float w,h;
+        SDL_GetTextureSize(texture, &w, &h);
+
+        SDL_FRect dst = {
+            (float)game.screen_width/2,
+            (float)game.screen_height/2.0f + i * 50.0f,
+            w,
+            h
+        };
+
+        SDL_RenderTexture(game.renderer, texture, nullptr, &dst);
+        SDL_DestroyTexture(texture);
+
     }
 }

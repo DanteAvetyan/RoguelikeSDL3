@@ -12,6 +12,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
 
 # Build SDL directly from our vendor directory.
 add_subdirectory(vendor/SDL EXCLUDE_FROM_ALL)
+add_subdirectory(vendor/SDL_ttf)
+
 
 # Our game executable.
 add_executable(RoguelikeSDL3
@@ -30,7 +32,12 @@ add_executable(RoguelikeSDL3
         src/entities/Character.cpp
         src/entities/Enemies.h
         src/entities/Enemies.cpp
+        src/engine/Camera.cpp
+        src/engine/Camera.h
+        src/ui/font.h
+        src/ui/font.cpp
 )
 
 # Link SDL3 to our game.
 target_link_libraries(RoguelikeSDL3 PRIVATE SDL3::SDL3)
+target_link_libraries(RoguelikeSDL3 PRIVATE SDL3_ttf::SDL3_ttf)

@@ -25,8 +25,3 @@ void draw_filled_oval(
     int radius_x,
     int radius_y
 );
-
-void camera_follow(
-    Camera& camera,
-    const Character& target
-);

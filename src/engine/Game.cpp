@@ -4,8 +4,10 @@
 #include "Renderer.h"
 #include "Input.h"
 #include "Menu.h"
+#include "Camera.h"
 #include "../entities/Character.h"
 #include "../entities/Player.h"
+#include "../ui/font.h"
 #include "../entities/Enemies.h"
 
 #include <SDL3/SDL.h>
@@ -15,11 +17,14 @@ Game game;
 
 bool initialize_game() {
 
+    // INIT SECTION
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         std::cerr << "SDL initialization failed: "
                   << SDL_GetError() << '\n';
         return false;
     }
+
+    TTF_Init();
 
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
     int window_w = mode ? (int)(mode->w * 0.8f) : 1280;
@@ -50,17 +55,8 @@ bool initialize_game() {
         return false;
     }
 
-    game.player.texture = load_texture(
-        game.renderer,
-        "assets/rpg_assets/Characters(100x100 split)/Soldier/Soldier/Soldier.png"
-    );
-
-    game.orc.texture = load_texture(
-        game.renderer,
-        "assets/rpg_assets/Characters(100x100 split)/Orc/Orc/Orc.png"
-    );
-    character_place(game.orc, 5, 3);
-    game.enemies.push_back(game.orc);
+    // LOAD SECTION
+    load_assets();
 
     if (!game.player.texture) {
         SDL_DestroyRenderer(game.renderer);
@@ -77,11 +73,33 @@ bool initialize_game() {
     SDL_GetRenderOutputSize(game.renderer, &game.screen_width, &game.screen_height);
 
     character_place(game.player, 2, 1);
-    camera_follow(game.camera, game.player);
+    camera_follow(game.player);
 
     return true;
 }
 
+void load_assets() {
+
+    game.player.texture = load_texture(
+        game.renderer,
+        "assets/rpg_assets/Characters(100x100 split)/Soldier/Soldier/Soldier.png"
+    );
+    game.orc.texture = load_texture(
+        game.renderer,
+        "assets/rpg_assets/Characters(100x100 split)/Orc/Orc/Orc.png"
+    );
+    character_place(game.orc, 5, 3);
+    game.enemies.push_back(game.orc);
+
+
+    const char* base = SDL_GetBasePath();
+    std::string font_path = std::string(base ? base : "") + "../../assets/fonts/Almendra/Almendra-Regular.ttf";
+    game.font = TTF_OpenFont(font_path.c_str(), 32.0f);
+    if (!game.font) {
+        SDL_Log("Failed to load font: %s", SDL_GetError());
+    }
+
+}
 
 static void playing_input(const SDL_Event& event) {
     users_ui_input(event);
@@ -93,7 +111,22 @@ static void playing_update(float dt) {
     character_update(game.player, dt);
     for (Character& e : game.enemies)
         character_update(e, dt);
-    camera_follow(game.camera, game.player);
+    camera_follow(game.player);
+}
+
+static void menu_font_renderer() {
+    SDL_Color white = { 255, 255, 255, 255 };
+    SDL_Surface* surface = TTF_RenderText_Solid(game.font, "Hello World", 0, white);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(game.renderer, surface);
+    SDL_DestroySurface(surface);
+
+    float w,h;
+    SDL_GetTextureSize(texture, &w, &h);
+    SDL_FRect dst = {100, 200, w, h};
+    SDL_RenderTexture(game.renderer, texture, nullptr, &dst);
+
+    //Cleanup
+    SDL_DestroyTexture(texture);
 }
 
 static void playing_render() {
@@ -170,6 +203,10 @@ void shutdown_game() {
 
     if (game.window) {
         SDL_DestroyWindow(game.window);
+    }
+    if (game.font) {
+        TTF_CloseFont(game.font);
+        TTF_Quit();
     }
 
     SDL_Quit();
